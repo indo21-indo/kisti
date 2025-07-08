@@ -1,8 +1,5 @@
-// 📁 index.js (Backend)
-
 const express = require("express");
 const cors = require("cors");
-const fs = require("fs");
 const path = require("path");
 const { MongoClient } = require("mongodb");
 require("dotenv").config();
@@ -29,7 +26,6 @@ async function connectDB() {
 }
 connectDB();
 
-// Generate unique 4-digit ID
 async function generateUniqueId() {
   let id;
   let exists = true;
@@ -64,7 +60,7 @@ app.get("/add-member", async (req, res) => {
         weeks: Number(weeks),
       },
       installments: [],
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     await members.insertOne(newMember);
@@ -85,7 +81,7 @@ app.get("/add-installment", async (req, res) => {
     const member = await members.findOne({ id });
     if (!member) return res.status(404).json({ error: "Member not found" });
 
-    const exists = member.installments.find(i => i.weekNo === week);
+    const exists = member.installments.find((i) => i.weekNo === week);
     if (exists) return res.status(409).json({ error: "Already paid this week" });
 
     await members.updateOne(
@@ -114,7 +110,7 @@ app.get("/status/:id", async (req, res) => {
       loan: member.loan,
       installments: member.installments,
       totalPaid,
-      remaining
+      remaining,
     });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
@@ -124,9 +120,9 @@ app.get("/status/:id", async (req, res) => {
 // All Members
 app.get("/all-members", async (req, res) => {
   try {
-    const all = await members.find({}, {
-      projection: { _id: 0, id: 1, name: 1, nid: 1, phone: 1 }
-    }).toArray();
+    const all = await members
+      .find({}, { projection: { _id: 0, id: 1, name: 1, nid: 1, phone: 1 } })
+      .toArray();
     res.json(all);
   } catch (err) {
     res.status(500).json({ error: "Server error" });
