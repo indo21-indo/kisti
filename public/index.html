@@ -1,131 +1,257 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Loan কিস্তি সিস্টেম</title>
-  <style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Loan কিস্তি SPA with Sidebar</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+  nav.sidebar {
+    width: 220px;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  }
+  nav.sidebar button {
+    background: #3b82f6;
+    border: none;
+    color: white;
+    padding: 15px 20px;
+    margin: 8px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  nav.sidebar button:hover {
+    background: #1e40af;
+    transform: translateX(4px);
+    box-shadow: 0 4px 10px rgba(30, 64, 175, 0.5);
+  }
+  nav.sidebar button.active {
+    background: #1e40af;
+    box-shadow: 0 6px 15px rgba(30, 64, 175, 0.8);
+  }
+
+  main.content {
+    flex: 1;
+    padding: 30px 40px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 0 15px 15px 0;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.07);
+  }
+
+  h2 {
+    color: #1e3a8a;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  input, button {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+  }
+  input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px #93c5fd;
+  }
+  button {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  button:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+  }
+  .result {
+    background: #f0f9ff;
+    border-left: 5px solid #0ea5e9;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    min-height: 60px;
+    font-family: monospace;
+  }
+  section {
+    display: none;
+  }
+  section.active {
+    display: block;
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #dbeafe, #e0f2fe);
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      flex-direction: column;
+      height: auto;
     }
-    .container {
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      width: 95%;
-      max-width: 500px;
-    }
-    h2 {
-      text-align: center;
-      color: #1e3a8a;
-    }
-    h3 {
-      color: #0369a1;
-      margin-top: 30px;
-    }
-    input, button {
+    nav.sidebar {
       width: 100%;
-      padding: 12px;
-      margin-top: 8px;
-      border: 1px solid #cbd5e1;
+      flex-direction: row;
+      padding: 10px 0;
+      overflow-x: auto;
+      box-shadow: none;
+      border-radius: 0 0 15px 15px;
+    }
+    nav.sidebar button {
+      flex: 1 0 auto;
+      margin: 0 5px;
+      text-align: center;
       border-radius: 8px;
-      box-sizing: border-box;
+      padding: 10px 0;
       font-size: 14px;
     }
-    input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 2px #93c5fd;
+    main.content {
+      border-radius: 0 0 15px 15px;
+      padding: 20px;
+      margin-top: 10px;
     }
-    button {
-      background-color: #2563eb;
-      color: white;
-      border: none;
-      transition: background 0.3s, transform 0.2s;
-    }
-    button:hover {
-      background-color: #1d4ed8;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
-    }
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      background: #f0f9ff;
-      border-left: 5px solid #0ea5e9;
-      border-radius: 8px;
-      white-space: pre-wrap;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h2>Loan কিস্তি ম্যানেজমেন্ট</h2><h3>১. মেম্বার যোগ করুন</h3>
-<input id="name" placeholder="নাম" />
-<input id="nid" placeholder="NID" />
-<input id="phone" placeholder="ফোন নম্বর" />
-<input id="address" placeholder="ঠিকানা" />
-<input id="amount" placeholder="ঋণের পরিমাণ" type="number" />
-<input id="weeks" placeholder="সাপ্তাহিক সংখ্যা" type="number" />
-<button onclick="addMember()">✅ মেম্বার যোগ করুন</button>
 
-<h3>২. কিস্তি দিন</h3>
-<input id="memberId" placeholder="Member ID" />
-<input id="weekNo" placeholder="Week No" type="number" />
-<input id="payAmount" placeholder="Amount Paid" type="number" />
-<button onclick="addInstallment()">💸 কিস্তি জমা দিন</button>
+<nav class="sidebar">
+  <button id="nav-add-member" class="active">➕ মেম্বার যোগ</button>
+  <button id="nav-add-installment">💸 কিস্তি দিন</button>
+  <button id="nav-status">📊 রিপোর্ট দেখুন</button>
+  <button id="nav-all-members">👥 সব মেম্বার</button>
+</nav>
 
-<h3>৩. রিপোর্ট দেখুন</h3>
-<input id="statusId" placeholder="Member ID" />
-<button onclick="getStatus()">📊 রিপোর্ট দেখুন</button>
+<main class="content">
 
-<div id="output" class="result"></div>
+  <section id="add-member" class="active">
+    <h2>মেম্বার যোগ করুন</h2>
+    <input id="name" placeholder="নাম" />
+    <input id="nid" placeholder="NID" />
+    <input id="phone" placeholder="ফোন নম্বর" />
+    <input id="address" placeholder="ঠিকানা" />
+    <input id="amount" placeholder="ঋণের পরিমাণ" type="number" />
+    <input id="weeks" placeholder="সাপ্তাহিক সংখ্যা" type="number" />
+    <button onclick="addMember()">✅ মেম্বার যোগ করুন</button>
+  </section>
 
-  </div>  <script>
-    const baseURL = ""; // same server origin
+  <section id="add-installment">
+    <h2>কিস্তি জমা দিন</h2>
+    <input id="memberId" placeholder="Member ID" />
+    <input id="weekNo" placeholder="Week No" type="number" />
+    <input id="payAmount" placeholder="Amount Paid" type="number" />
+    <button onclick="addInstallment()">💸 কিস্তি জমা দিন</button>
+  </section>
 
-    async function addMember() {
-      const name = document.getElementById("name").value;
-      const nid = document.getElementById("nid").value;
-      const phone = document.getElementById("phone").value;
-      const address = document.getElementById("address").value;
-      const amount = document.getElementById("amount").value;
-      const weeks = document.getElementById("weeks").value;
-      if (!name || !nid || !phone || !amount || !weeks) {
-        return alert("সব তথ্য দিন");
-      }
+  <section id="status">
+    <h2>রিপোর্ট দেখুন</h2>
+    <input id="statusId" placeholder="Member ID" />
+    <button onclick="getStatus()">📊 রিপোর্ট দেখুন</button>
+    <div id="output" class="result"></div>
+  </section>
 
-      const res = await fetch(`${baseURL}/add-member?name=${name}&nid=${nid}&phone=${phone}&address=${address}&amount=${amount}&weeks=${weeks}`);
-      const data = await res.json();
-      document.getElementById("output").innerText = `✅ মেম্বার যোগ হয়েছে: ${data.id}`;
+  <section id="all-members">
+    <h2>সব মেম্বার</h2>
+    <button onclick="getAllMembers()">👥 মেম্বার লিস্ট দেখুন</button>
+    <div id="membersList" class="result"></div>
+  </section>
+
+</main>
+
+<script>
+  const baseURL = ""; // same origin
+
+  const navButtons = document.querySelectorAll("nav.sidebar button");
+  const sections = document.querySelectorAll("main.content section");
+
+  navButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      // Remove active from buttons
+      navButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      // Hide all sections
+      sections.forEach(s => s.classList.remove("active"));
+
+      // Show clicked section
+      const id = btn.id.replace("nav-", "");
+      document.getElementById(id).classList.add("active");
+
+      // Clear outputs
+      const out = document.getElementById("output");
+      const list = document.getElementById("membersList");
+      if(out) out.innerText = "";
+      if(list) list.innerText = "";
+    });
+  });
+
+  async function addMember() {
+    const name = document.getElementById("name").value.trim();
+    const nid = document.getElementById("nid").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const amount = document.getElementById("amount").value.trim();
+    const weeks = document.getElementById("weeks").value.trim();
+    if (!name || !nid || !phone || !amount || !weeks) {
+      alert("সব তথ্য দিন");
+      return;
     }
+    const res = await fetch(`${baseURL}/add-member?name=${encodeURIComponent(name)}&nid=${encodeURIComponent(nid)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&amount=${amount}&weeks=${weeks}`);
+    const data = await res.json();
+    alert(`মেম্বার যোগ হয়েছে: ${data.id}`);
+    ["name","nid","phone","address","amount","weeks"].forEach(id => document.getElementById(id).value = "");
+  }
 
-    async function addInstallment() {
-      const memberId = document.getElementById("memberId").value;
-      const weekNo = document.getElementById("weekNo").value;
-      const amount = document.getElementById("payAmount").value;
-      if (!memberId || !weekNo || !amount) {
-        return alert("সব তথ্য দিন");
-      }
-
-      const res = await fetch(`${baseURL}/add-installment?memberId=${memberId}&amount=${amount}&weekNo=${weekNo}`);
-      const data = await res.json();
-      document.getElementById("output").innerText = `💸 কিস্তি যোগ হয়েছে: ${data.message}`;
+  async function addInstallment() {
+    const memberId = document.getElementById("memberId").value.trim();
+    const weekNo = document.getElementById("weekNo").value.trim();
+    const amount = document.getElementById("payAmount").value.trim();
+    if (!memberId || !weekNo || !amount) {
+      alert("সব তথ্য দিন");
+      return;
     }
+    const res = await fetch(`${baseURL}/add-installment?memberId=${encodeURIComponent(memberId)}&amount=${amount}&weekNo=${weekNo}`);
+    const data = await res.json();
+    alert(data.message);
+    ["memberId", "weekNo", "payAmount"].forEach(id => document.getElementById(id).value = "");
+  }
 
-    async function getStatus() {
-      const id = document.getElementById("statusId").value;
-      if (!id) return alert("Member ID দিন");
-      const res = await fetch(`${baseURL}/status/${id}`);
-      const data = await res.json();
-      document.getElementById("output").innerText = `
+  async function getStatus() {
+    const id = document.getElementById("statusId").value.trim();
+    if (!id) {
+      alert("Member ID দিন");
+      return;
+    }
+    const res = await fetch(`${baseURL}/status/${encodeURIComponent(id)}`);
+    if (res.status !== 200) {
+      alert("Member পাওয়া যায়নি");
+      return;
+    }
+    const data = await res.json();
+    document.getElementById("output").innerText = `
 নাম: ${data.name}
 ঋণের পরিমাণ: ${data.loan.amount}
 মোট ফেরত: ${data.loan.totalPayable}
@@ -133,6 +259,22 @@
 পরিশোধ: ${data.totalPaid}
 বাকি: ${data.remaining}
 `;
+  }
+
+  async function getAllMembers() {
+    const res = await fetch(`${baseURL}/all-members`);
+    const data = await res.json();
+    if (!data.length) {
+      document.getElementById("membersList").innerText = "কোন মেম্বার পাওয়া যায়নি।";
+      return;
     }
-  </script></body>
+    let list = "";
+    data.forEach(m => {
+      list += `নাম: ${m.name}, NID: ${m.nid}, ফোন: ${m.phone}\n`;
+    });
+    document.getElementById("membersList").innerText = list;
+  }
+</script>
+
+</body>
 </html>
