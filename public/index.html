@@ -1,1 +1,138 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loan কিস্তি সিস্টেম</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #dbeafe, #e0f2fe);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 95%;
+      max-width: 500px;
+    }
+    h2 {
+      text-align: center;
+      color: #1e3a8a;
+    }
+    h3 {
+      color: #0369a1;
+      margin-top: 30px;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px #93c5fd;
+    }
+    button {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      transition: background 0.3s, transform 0.2s;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f0f9ff;
+      border-left: 5px solid #0ea5e9;
+      border-radius: 8px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Loan কিস্তি ম্যানেজমেন্ট</h2><h3>১. মেম্বার যোগ করুন</h3>
+<input id="name" placeholder="নাম" />
+<input id="nid" placeholder="NID" />
+<input id="phone" placeholder="ফোন নম্বর" />
+<input id="address" placeholder="ঠিকানা" />
+<input id="amount" placeholder="ঋণের পরিমাণ" type="number" />
+<input id="weeks" placeholder="সাপ্তাহিক সংখ্যা" type="number" />
+<button onclick="addMember()">✅ মেম্বার যোগ করুন</button>
 
+<h3>২. কিস্তি দিন</h3>
+<input id="memberId" placeholder="Member ID" />
+<input id="weekNo" placeholder="Week No" type="number" />
+<input id="payAmount" placeholder="Amount Paid" type="number" />
+<button onclick="addInstallment()">💸 কিস্তি জমা দিন</button>
+
+<h3>৩. রিপোর্ট দেখুন</h3>
+<input id="statusId" placeholder="Member ID" />
+<button onclick="getStatus()">📊 রিপোর্ট দেখুন</button>
+
+<div id="output" class="result"></div>
+
+  </div>  <script>
+    const baseURL = ""; // same server origin
+
+    async function addMember() {
+      const name = document.getElementById("name").value;
+      const nid = document.getElementById("nid").value;
+      const phone = document.getElementById("phone").value;
+      const address = document.getElementById("address").value;
+      const amount = document.getElementById("amount").value;
+      const weeks = document.getElementById("weeks").value;
+      if (!name || !nid || !phone || !amount || !weeks) {
+        return alert("সব তথ্য দিন");
+      }
+
+      const res = await fetch(`${baseURL}/add-member?name=${name}&nid=${nid}&phone=${phone}&address=${address}&amount=${amount}&weeks=${weeks}`);
+      const data = await res.json();
+      document.getElementById("output").innerText = `✅ মেম্বার যোগ হয়েছে: ${data.id}`;
+    }
+
+    async function addInstallment() {
+      const memberId = document.getElementById("memberId").value;
+      const weekNo = document.getElementById("weekNo").value;
+      const amount = document.getElementById("payAmount").value;
+      if (!memberId || !weekNo || !amount) {
+        return alert("সব তথ্য দিন");
+      }
+
+      const res = await fetch(`${baseURL}/add-installment?memberId=${memberId}&amount=${amount}&weekNo=${weekNo}`);
+      const data = await res.json();
+      document.getElementById("output").innerText = `💸 কিস্তি যোগ হয়েছে: ${data.message}`;
+    }
+
+    async function getStatus() {
+      const id = document.getElementById("statusId").value;
+      if (!id) return alert("Member ID দিন");
+      const res = await fetch(`${baseURL}/status/${id}`);
+      const data = await res.json();
+      document.getElementById("output").innerText = `
+নাম: ${data.name}
+ঋণের পরিমাণ: ${data.loan.amount}
+মোট ফেরত: ${data.loan.totalPayable}
+সপ্তাহে কিস্তি: ${data.loan.weeklyInstallment}
+পরিশোধ: ${data.totalPaid}
+বাকি: ${data.remaining}
+`;
+    }
+  </script></body>
+</html>
