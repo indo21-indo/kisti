@@ -255,7 +255,7 @@
   <div id="toast"></div>
 
   <script>
-    const baseURL = ""; // আপনার সার্ভারের URL
+    const baseURL = ""; // আপনার সার্ভারের URL দিন
 
     // Navigation
     const navButtons = document.querySelectorAll("nav.sidebar button");
@@ -375,7 +375,7 @@
       showToast(data.message || data.error, !data.error);
     }
 
-    // Get status
+    // Get status report
     async function getStatus() {
       const id = document.getElementById("statusId").value.trim();
       if (!id) {
@@ -390,4 +390,124 @@
       }
       document.getElementById("output").innerText = `
 নাম: ${data.name}
-ঋণের
+ঋণের পরিমাণ: ${data.loan.amount}
+মোট ফেরত: ${data.loan.totalPayable}
+সাপ্তাহিক কিস্তি: ${data.loan.weeklyInstallment}
+পরিশোধিত: ${data.totalPaid}
+বাকি: ${data.remaining}
+কিস্তি বিস্তারিত:
+${data.installments.length === 0 ? "কোন কিস্তি পরিশোধ হয়নি।" : data.installments.map(i => `- সপ্তাহ ${i.weekNo}: ${i.amount} টাকা (তারিখ: ${new Date(i.date).toLocaleDateString()})`).join('\n')}
+      `;
+    }
+
+    // Get all members & show cards
+    async function getAllMembers() {
+      const res = await fetch(`${baseURL}/all-members`);
+      const members = await res.json();
+      if (members.error) {
+        showToast(members.error, false);
+        return;
+      }
+
+      const container = document.getElementById("membersList");
+      container.innerHTML = "";
+      if (members.length === 0) {
+        container.innerHTML = "<p>কোন মেম্বার পাওয়া যায়নি।</p>";
+        return;
+      }
+      members.forEach((m) => {
+        const card = document.createElement("div");
+        card.className = "member-card";
+        card.innerHTML = `
+          <b>${m.name}</b><br/>
+          ID: ${m.id}<br/>
+          ফোন: ${m.phone}<br/>
+          NID: ${m.nid}
+        `;
+        card.onclick = () => showMemberDetails(m.id);
+        container.appendChild(card);
+      });
+    }
+
+    // Show member full details popup
+    async function showMemberDetails(id) {
+      const res = await fetch(`${baseURL}/status/${id}`);
+      const data = await res.json();
+      if (data.error) {
+        showToast(data.error, false);
+        return;
+      }
+      const container = document.getElementById("memberDetails");
+      container.innerHTML = `
+        <h3>${data.name} (ID: ${id})</h3>
+        <p><b>ঋণের পরিমাণ:</b> ${data.loan.amount}</p>
+        <p><b>মোট ফেরত:</b> ${data.loan.totalPayable}</p>
+        <p><b>সাপ্তাহিক কিস্তি:</b> ${data.loan.weeklyInstallment}</p>
+        <p><b>পরিশোধিত:</b> ${data.totalPaid}</p>
+        <p><b>বাকি:</b> ${data.remaining}</p>
+        <hr/>
+        <h4>কিস্তি বিস্তারিত:</h4>
+        ${data.installments.length === 0 ? "<p>কোন কিস্তি পরিশোধ হয়নি।</p>" :
+          `<ul>${data.installments.map(i => `<li>সপ্তাহ ${i.weekNo}: ${i.amount} টাকা (তারিখ: ${new Date(i.date).toLocaleDateString()})</li>`).join('')}</ul>`}
+      `;
+      document.getElementById("memberDetailsSection").style.display = "block";
+    }
+
+    function closeDetails() {
+      document.getElementById("memberDetailsSection").style.display = "none";
+    }
+
+    // Week number dropdown with filter & autocomplete
+    const weekInput = document.getElementById("weekNo");
+    const weekDropdown = document.getElementById("weekDropdown");
+
+    function generateWeekList() {
+      let weeks = [];
+      for (let i = 1; i <= 40; i++) weeks.push(i);
+      return weeks;
+    }
+
+    weekInput.addEventListener("input", () => {
+      const val = weekInput.value.trim();
+      if (!val) {
+        weekDropdown.style.display = "none";
+        return;
+      }
+      const weeks = generateWeekList().filter((w) => w.toString().startsWith(val));
+      if (weeks.length === 0) {
+        weekDropdown.style.display = "none";
+        return;
+      }
+      weekDropdown.innerHTML = weeks
+        .map((w) => `<li>${w}</li>`)
+        .join("");
+      weekDropdown.style.display = "block";
+    });
+
+    weekDropdown.addEventListener("click", (e) => {
+      if (e.target.tagName === "LI") {
+        weekInput.value = e.target.innerText;
+        weekDropdown.style.display = "none";
+        checkInstallment(); // Auto check installment when select from dropdown
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!weekDropdown.contains(e.target) && e.target !== weekInput) {
+        weekDropdown.style.display = "none";
+      }
+    });
+
+    // Auto check installment amount when user inputs week number manually
+    weekInput.addEventListener("change", () => {
+      checkInstallment();
+    });
+    weekInput.addEventListener("blur", () => {
+      setTimeout(() => { // Delay so dropdown click works
+        weekDropdown.style.display = "none";
+      }, 200);
+    });
+
+  </script>
+</body>
+</html>
