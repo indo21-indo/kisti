@@ -1,3 +1,5 @@
+// 📁 index.js (Backend)
+
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
@@ -27,7 +29,7 @@ async function connectDB() {
 }
 connectDB();
 
-// 🔢 Generate unique random ID between 1010-2020
+// Generate unique 4-digit ID
 async function generateUniqueId() {
   let id;
   let exists = true;
@@ -39,12 +41,12 @@ async function generateUniqueId() {
   return id;
 }
 
-// ➕ Add Member
+// Add Member
 app.get("/add-member", async (req, res) => {
   try {
     const { name, nid, phone, address, amount, weeks } = req.query;
     if (!name || !nid || !phone || !amount || !weeks) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ error: "Missing fields" });
     }
 
     const id = await generateUniqueId();
@@ -68,12 +70,11 @@ app.get("/add-member", async (req, res) => {
     await members.insertOne(newMember);
     res.json({ message: "Member added", id });
   } catch (err) {
-    console.error("Add Member Error:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// 💸 Add Installment
+// Add Installment
 app.get("/add-installment", async (req, res) => {
   try {
     const { memberId, weekNo, amount } = req.query;
@@ -85,7 +86,7 @@ app.get("/add-installment", async (req, res) => {
     if (!member) return res.status(404).json({ error: "Member not found" });
 
     const exists = member.installments.find(i => i.weekNo === week);
-    if (exists) return res.status(409).json({ error: "Already paid for this week" });
+    if (exists) return res.status(409).json({ error: "Already paid this week" });
 
     await members.updateOne(
       { id },
@@ -94,12 +95,11 @@ app.get("/add-installment", async (req, res) => {
 
     res.json({ message: `Week ${week} installment added.` });
   } catch (err) {
-    console.error("Installment Error:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// 📊 Member Status
+// Member Status
 app.get("/status/:id", async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -112,32 +112,29 @@ app.get("/status/:id", async (req, res) => {
     res.json({
       name: member.name,
       loan: member.loan,
+      installments: member.installments,
       totalPaid,
       remaining
     });
   } catch (err) {
-    console.error("Status Error:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// 👥 All Members
+// All Members
 app.get("/all-members", async (req, res) => {
   try {
-    const all = await members.find({}, { projection: { _id: 0, id: 1, name: 1, nid: 1, phone: 1 } }).toArray();
+    const all = await members.find({}, {
+      projection: { _id: 0, id: 1, name: 1, nid: 1, phone: 1 }
+    }).toArray();
     res.json(all);
   } catch (err) {
-    console.error("All Members Error:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// 🌐 Root
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Start
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
