@@ -154,8 +154,8 @@
 
     <section id="add-installment">
       <h2>কিস্তি জমা দিন</h2>
-      <input id="memberId" placeholder="Member ID" />
-      <input id="weekNo" placeholder="Week No" type="number" />
+      <input id="memberId" placeholder="Member ID" onblur="checkInstallment()" />
+      <input id="weekNo" placeholder="Week No" type="number" onblur="checkInstallment()" />
       <input id="payAmount" placeholder="Amount Paid" type="number" />
       <button onclick="addInstallment()">💸 কিস্তি দিন</button>
     </section>
@@ -178,7 +178,7 @@
   <div id="toast"></div>
 
   <script>
-    const baseURL = ""; // Render URL or current
+    const baseURL = ""; // আপনার server URL (অথবা খালি থাকলে একই domain)
 
     const navButtons = document.querySelectorAll("nav.sidebar button");
     const sections = document.querySelectorAll("main.content section");
@@ -232,9 +232,38 @@
       const res = await fetch(`${baseURL}/add-member?name=${encodeURIComponent(name)}&nid=${encodeURIComponent(nid)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&amount=${amount}&weeks=${weeks}`);
       const data = await res.json();
 
+      if(data.error){
+        showToast(data.error, false);
+        return;
+      }
+
       showToast(`মেম্বার যোগ হয়েছে! ID: ${data.id}`);
       ["name", "nid", "phone", "address", "amount", "weeks"].forEach(id => document.getElementById(id).value = "");
       document.getElementById("installmentPreview").innerText = "";
+    }
+
+    async function checkInstallment() {
+      const id = document.getElementById("memberId").value.trim();
+      const week = Number(document.getElementById("weekNo").value.trim());
+      if (!id || !week) return;
+
+      const res = await fetch(`${baseURL}/status/${id}`);
+      const data = await res.json();
+
+      if (data.error) {
+        showToast(data.error, false);
+        return;
+      }
+
+      const paid = data.installments.find(i => i.weekNo === week);
+      if (paid) {
+        document.getElementById("payAmount").value = paid.amount;
+        showToast(`⚠️ Week ${week} already paid (${paid.amount} টাকা)`, false);
+      } else {
+        const weekly = data.loan.weeklyInstallment;
+        document.getElementById("payAmount").value = weekly;
+        showToast(`এই সপ্তাহে ${weekly} টাকা জমা দিতে হবে`, true);
+      }
     }
 
     async function addInstallment() {
