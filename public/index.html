@@ -1,280 +1,303 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Loan কিস্তি SPA with Sidebar</title>
-<style>
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0; padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f0f4f8;
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-  }
-  nav.sidebar {
-    width: 220px;
-    background: #2563eb;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    padding: 20px 0;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
-  }
-  nav.sidebar button {
-    background: #3b82f6;
-    border: none;
-    color: white;
-    padding: 15px 20px;
-    margin: 8px 20px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    text-align: left;
-    transition: background-color 0.3s, transform 0.2s;
-  }
-  nav.sidebar button:hover {
-    background: #1e40af;
-    transform: translateX(4px);
-    box-shadow: 0 4px 10px rgba(30, 64, 175, 0.5);
-  }
-  nav.sidebar button.active {
-    background: #1e40af;
-    box-shadow: 0 6px 15px rgba(30, 64, 175, 0.8);
-  }
-
-  main.content {
-    flex: 1;
-    padding: 30px 40px;
-    overflow-y: auto;
-    background: white;
-    border-radius: 0 15px 15px 0;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.07);
-  }
-
-  h2 {
-    color: #1e3a8a;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  input, button {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    font-size: 15px;
-    box-sizing: border-box;
-    transition: border-color 0.3s;
-  }
-  input:focus {
-    outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px #93c5fd;
-  }
-  button {
-    background-color: #2563eb;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-  }
-  button:hover {
-    background-color: #1d4ed8;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
-  }
-  .result {
-    background: #f0f9ff;
-    border-left: 5px solid #0ea5e9;
-    padding: 15px;
-    margin-top: 15px;
-    border-radius: 8px;
-    white-space: pre-wrap;
-    min-height: 60px;
-    font-family: monospace;
-  }
-  section {
-    display: none;
-  }
-  section.active {
-    display: block;
-  }
-
-  /* Responsive */
-  @media (max-width: 700px) {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Loan কিস্তি SPA</title>
+  <style>
+    * { box-sizing: border-box; }
     body {
-      flex-direction: column;
-      height: auto;
+      margin: 0;
+      display: flex;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f8fafc;
+      height: 100vh;
+      overflow: hidden;
     }
     nav.sidebar {
-      width: 100%;
-      flex-direction: row;
-      padding: 10px 0;
-      overflow-x: auto;
-      box-shadow: none;
-      border-radius: 0 0 15px 15px;
+      width: 220px;
+      background: #2563eb;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      color: white;
     }
     nav.sidebar button {
-      flex: 1 0 auto;
-      margin: 0 5px;
-      text-align: center;
-      border-radius: 8px;
-      padding: 10px 0;
-      font-size: 14px;
+      background: #3b82f6;
+      border: none;
+      color: white;
+      padding: 15px 20px;
+      margin: 8px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      transition: 0.3s;
+    }
+    nav.sidebar button:hover {
+      background: #1e40af;
+      transform: translateX(4px);
+    }
+    nav.sidebar button.active {
+      background: #1e40af;
     }
     main.content {
-      border-radius: 0 0 15px 15px;
-      padding: 20px;
-      margin-top: 10px;
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
     }
-  }
-</style>
+    section { display: none; }
+    section.active { display: block; }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      font-size: 15px;
+      border: 1px solid #cbd5e1;
+    }
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px #93c5fd;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    h2 {
+      color: #1e3a8a;
+      margin-bottom: 15px;
+    }
+
+    #membersList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .member-card {
+      background: #f1f5f9;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 220px;
+    }
+
+    #toast {
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #0ea5e9;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      font-weight: bold;
+      z-index: 9999;
+      transition: all 0.5s ease;
+    }
+
+    @media(max-width: 700px) {
+      body {
+        flex-direction: column;
+        height: auto;
+      }
+      nav.sidebar {
+        flex-direction: row;
+        overflow-x: auto;
+        width: 100%;
+      }
+      nav.sidebar button {
+        flex: 1;
+        font-size: 14px;
+        margin: 5px;
+        text-align: center;
+      }
+      main.content {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<nav class="sidebar">
-  <button id="nav-add-member" class="active">➕ মেম্বার যোগ</button>
-  <button id="nav-add-installment">💸 কিস্তি দিন</button>
-  <button id="nav-status">📊 রিপোর্ট দেখুন</button>
-  <button id="nav-all-members">👥 সব মেম্বার</button>
-</nav>
+  <nav class="sidebar">
+    <button id="nav-add-member" class="active">➕ মেম্বার যোগ</button>
+    <button id="nav-add-installment">💸 কিস্তি দিন</button>
+    <button id="nav-status">📊 রিপোর্ট</button>
+    <button id="nav-all-members">👥 সব মেম্বার</button>
+  </nav>
 
-<main class="content">
+  <main class="content">
 
-  <section id="add-member" class="active">
-    <h2>মেম্বার যোগ করুন</h2>
-    <input id="name" placeholder="নাম" />
-    <input id="nid" placeholder="NID" />
-    <input id="phone" placeholder="ফোন নম্বর" />
-    <input id="address" placeholder="ঠিকানা" />
-    <input id="amount" placeholder="ঋণের পরিমাণ" type="number" />
-    <input id="weeks" placeholder="সাপ্তাহিক সংখ্যা" type="number" />
-    <button onclick="addMember()">✅ মেম্বার যোগ করুন</button>
-  </section>
+    <section id="add-member" class="active">
+      <h2>মেম্বার যোগ করুন</h2>
+      <input id="name" type="text" placeholder="নাম" />
+      <input id="nid" type="number" placeholder="NID নম্বর" />
+      <input id="phone" type="number" placeholder="ফোন নম্বর" />
+      <input id="address" type="text" placeholder="ঠিকানা" />
+      <input id="amount" type="number" placeholder="ঋণের পরিমাণ" oninput="updateInstallment()" />
+      <input id="weeks" type="number" placeholder="সাপ্তাহিক সংখ্যা" oninput="updateInstallment()" />
+      <div id="installmentPreview" style="font-weight: bold; color: #0f172a; margin-bottom: 10px;"></div>
+      <button onclick="addMember()">✅ মেম্বার যোগ করুন</button>
+    </section>
 
-  <section id="add-installment">
-    <h2>কিস্তি জমা দিন</h2>
-    <input id="memberId" placeholder="Member ID" />
-    <input id="weekNo" placeholder="Week No" type="number" />
-    <input id="payAmount" placeholder="Amount Paid" type="number" />
-    <button onclick="addInstallment()">💸 কিস্তি জমা দিন</button>
-  </section>
+    <section id="add-installment">
+      <h2>কিস্তি জমা দিন</h2>
+      <input id="memberId" placeholder="Member ID" />
+      <input id="weekNo" placeholder="Week No" type="number" />
+      <input id="payAmount" placeholder="Amount Paid" type="number" />
+      <button onclick="addInstallment()">💸 কিস্তি দিন</button>
+    </section>
 
-  <section id="status">
-    <h2>রিপোর্ট দেখুন</h2>
-    <input id="statusId" placeholder="Member ID" />
-    <button onclick="getStatus()">📊 রিপোর্ট দেখুন</button>
-    <div id="output" class="result"></div>
-  </section>
+    <section id="status">
+      <h2>মেম্বার রিপোর্ট</h2>
+      <input id="statusId" placeholder="Member ID" />
+      <button onclick="getStatus()">📊 রিপোর্ট দেখুন</button>
+      <div id="output" style="white-space:pre-line; background:#e0f2fe; padding:10px; border-radius:10px; margin-top:10px;"></div>
+    </section>
 
-  <section id="all-members">
-    <h2>সব মেম্বার</h2>
-    <button onclick="getAllMembers()">👥 মেম্বার লিস্ট দেখুন</button>
-    <div id="membersList" class="result"></div>
-  </section>
+    <section id="all-members">
+      <h2>সব মেম্বার</h2>
+      <button onclick="getAllMembers()">👥 মেম্বার লিস্ট দেখুন</button>
+      <div id="membersList"></div>
+    </section>
 
-</main>
+  </main>
 
-<script>
-  const baseURL = ""; // same origin
+  <div id="toast"></div>
 
-  const navButtons = document.querySelectorAll("nav.sidebar button");
-  const sections = document.querySelectorAll("main.content section");
+  <script>
+    const baseURL = ""; // Render URL or current
 
-  navButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      // Remove active from buttons
-      navButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
+    const navButtons = document.querySelectorAll("nav.sidebar button");
+    const sections = document.querySelectorAll("main.content section");
 
-      // Hide all sections
-      sections.forEach(s => s.classList.remove("active"));
-
-      // Show clicked section
-      const id = btn.id.replace("nav-", "");
-      document.getElementById(id).classList.add("active");
-
-      // Clear outputs
-      const out = document.getElementById("output");
-      const list = document.getElementById("membersList");
-      if(out) out.innerText = "";
-      if(list) list.innerText = "";
+    navButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        navButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        sections.forEach(s => s.classList.remove("active"));
+        const id = btn.id.replace("nav-", "");
+        document.getElementById(id).classList.add("active");
+      });
     });
-  });
 
-  async function addMember() {
-    const name = document.getElementById("name").value.trim();
-    const nid = document.getElementById("nid").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const address = document.getElementById("address").value.trim();
-    const amount = document.getElementById("amount").value.trim();
-    const weeks = document.getElementById("weeks").value.trim();
-    if (!name || !nid || !phone || !amount || !weeks) {
-      alert("সব তথ্য দিন");
-      return;
+    function updateInstallment() {
+      const amount = Number(document.getElementById("amount").value);
+      const weeks = Number(document.getElementById("weeks").value);
+      const preview = document.getElementById("installmentPreview");
+      if (amount && weeks) {
+        preview.innerText = `প্রতি সপ্তাহে কিস্তি: ${Math.round(amount / weeks)} টাকা`;
+      } else {
+        preview.innerText = "";
+      }
     }
-    const res = await fetch(`${baseURL}/add-member?name=${encodeURIComponent(name)}&nid=${encodeURIComponent(nid)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&amount=${amount}&weeks=${weeks}`);
-    const data = await res.json();
-    alert(`মেম্বার যোগ হয়েছে: ${data.id}`);
-    ["name","nid","phone","address","amount","weeks"].forEach(id => document.getElementById(id).value = "");
-  }
 
-  async function addInstallment() {
-    const memberId = document.getElementById("memberId").value.trim();
-    const weekNo = document.getElementById("weekNo").value.trim();
-    const amount = document.getElementById("payAmount").value.trim();
-    if (!memberId || !weekNo || !amount) {
-      alert("সব তথ্য দিন");
-      return;
+    function showToast(msg, success = true) {
+      const toast = document.getElementById("toast");
+      toast.style.background = success ? "#22c55e" : "#ef4444";
+      toast.innerText = msg;
+      toast.style.display = "block";
+      toast.style.opacity = "1";
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => { toast.style.display = "none"; }, 500);
+      }, 3000);
     }
-    const res = await fetch(`${baseURL}/add-installment?memberId=${encodeURIComponent(memberId)}&amount=${amount}&weekNo=${weekNo}`);
-    const data = await res.json();
-    alert(data.message);
-    ["memberId", "weekNo", "payAmount"].forEach(id => document.getElementById(id).value = "");
-  }
 
-  async function getStatus() {
-    const id = document.getElementById("statusId").value.trim();
-    if (!id) {
-      alert("Member ID দিন");
-      return;
+    async function addMember() {
+      const name = document.getElementById("name").value.trim();
+      const nid = document.getElementById("nid").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const amount = document.getElementById("amount").value.trim();
+      const weeks = document.getElementById("weeks").value.trim();
+
+      if (!name || !nid || !phone || !amount || !weeks) {
+        showToast("সব তথ্য দিন ভাই 😥", false);
+        return;
+      }
+
+      const res = await fetch(`${baseURL}/add-member?name=${encodeURIComponent(name)}&nid=${encodeURIComponent(nid)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&amount=${amount}&weeks=${weeks}`);
+      const data = await res.json();
+
+      showToast(`মেম্বার যোগ হয়েছে! ID: ${data.id}`);
+      ["name", "nid", "phone", "address", "amount", "weeks"].forEach(id => document.getElementById(id).value = "");
+      document.getElementById("installmentPreview").innerText = "";
     }
-    const res = await fetch(`${baseURL}/status/${encodeURIComponent(id)}`);
-    if (res.status !== 200) {
-      alert("Member পাওয়া যায়নি");
-      return;
+
+    async function addInstallment() {
+      const id = document.getElementById("memberId").value.trim();
+      const week = document.getElementById("weekNo").value.trim();
+      const amt = document.getElementById("payAmount").value.trim();
+
+      if (!id || !week || !amt) {
+        showToast("সব ফিল্ড পূরণ করুন", false);
+        return;
+      }
+
+      const res = await fetch(`${baseURL}/add-installment?memberId=${id}&weekNo=${week}&amount=${amt}`);
+      const data = await res.json();
+      showToast(data.message || data.error, !data.error);
     }
-    const data = await res.json();
-    document.getElementById("output").innerText = `
+
+    async function getStatus() {
+      const id = document.getElementById("statusId").value.trim();
+      if (!id) {
+        showToast("ID দিন", false);
+        return;
+      }
+      const res = await fetch(`${baseURL}/status/${id}`);
+      const data = await res.json();
+      if (data.error) {
+        showToast(data.error, false);
+        return;
+      }
+      document.getElementById("output").innerText = `
 নাম: ${data.name}
 ঋণের পরিমাণ: ${data.loan.amount}
 মোট ফেরত: ${data.loan.totalPayable}
 সপ্তাহে কিস্তি: ${data.loan.weeklyInstallment}
 পরিশোধ: ${data.totalPaid}
 বাকি: ${data.remaining}
-`;
-  }
-
-  async function getAllMembers() {
-    const res = await fetch(`${baseURL}/all-members`);
-    const data = await res.json();
-    if (!data.length) {
-      document.getElementById("membersList").innerText = "কোন মেম্বার পাওয়া যায়নি।";
-      return;
+      `;
     }
-    let list = "";
-    data.forEach(m => {
-      list += `নাম: ${m.name}, NID: ${m.nid}, ফোন: ${m.phone}\n`;
-    });
-    document.getElementById("membersList").innerText = list;
-  }
-</script>
+
+    async function getAllMembers() {
+      const res = await fetch(`${baseURL}/all-members`);
+      const data = await res.json();
+      const container = document.getElementById("membersList");
+      container.innerHTML = "";
+
+      if (!data.length) {
+        container.innerHTML = "<p>কোন মেম্বার পাওয়া যায়নি।</p>";
+        return;
+      }
+
+      data.forEach(m => {
+        const card = document.createElement("div");
+        card.className = "member-card";
+        card.innerHTML = `
+<strong>নাম:</strong> ${m.name}<br/>
+<strong>ID:</strong> ${m.id}<br/>
+<strong>NID:</strong> ${m.nid}<br/>
+<strong>ফোন:</strong> ${m.phone}
+        `;
+        container.appendChild(card);
+      });
+    }
+  </script>
 
 </body>
 </html>
