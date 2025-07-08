@@ -1,148 +1,314 @@
-<!DOCTYPE html><html lang="bn">
+<!DOCTYPE html>
+<html lang="bn">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>আসা কিস্তি সিস্টেম</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>আসা কিস্তি অ্যাপ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Noto Sans Bengali', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    header {
+      background: #007bff;
+      padding: 20px;
+      text-align: center;
+      color: white;
+      font-size: 26px;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    form h2 {
+      margin-top: 0;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 18px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #membersList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+    }
+    .member-card {
+      background: white;
+      padding: 16px;
+      width: 240px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .member-card:hover {
+      transform: translateY(-4px);
+    }
+
+    /* Details Section */
+    #memberDetailsSection {
+      display: none;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-top: 30px;
+    }
+    #memberDetailsSection h3 {
+      margin-top: 0;
+    }
+
+    .installments {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .installment {
+      background: #28a745;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 14px 20px;
+      border-radius: 8px;
+      background: #28a745;
+      color: white;
+      font-weight: bold;
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.4s ease;
+      z-index: 999;
+    }
+    #toast.error {
+      background: #e74c3c;
+    }
+    #toast.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 600px) {
+      .member-card {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
+
+  <header>আসা কিস্তি সিস্টেম</header>
+
   <div class="container">
-    <h1>আসা কিস্তি সিস্টেম</h1><!-- Add Member Form -->
-<form id="addMemberForm">
-  <input type="text" id="name" placeholder="নাম" required />
-  <input type="number" id="phone" placeholder="ফোন" required />
-  <input type="number" id="nid" placeholder="NID" required />
-  <input type="number" id="loanAmount" placeholder="অর্থ পরিমাণ" required />
-  <input type="number" id="weeklyInstallments" placeholder="সাপ্তাহিক কিস্তি সংখ্যা" required />
-  <button type="submit">যোগ করুন</button>
-</form>
+    
+    <form id="addMemberForm">
+      <h2>নতুন মেম্বার যোগ করুন</h2>
+      <label>নাম</label>
+      <input type="text" id="name" required>
+      
+      <label>ফোন নম্বর</label>
+      <input type="number" id="phone" required>
 
-<!-- Members List -->
-<div id="membersList"></div>
+      <label>NID</label>
+      <input type="number" id="nid" required>
 
-<!-- Member Details -->
-<div id="memberDetailsSection" style="display:none">
-  <button onclick="closeDetails()">X</button>
-  <div id="memberDetails"></div>
-</div>
+      <label>ঋণের পরিমাণ</label>
+      <input type="number" id="loanAmount" required>
 
-<!-- Add Installment Form -->
-<form id="installmentForm">
-  <input type="number" id="memberId" placeholder="মেম্বার ID" required />
-  <input type="number" id="weekNo" placeholder="সপ্তাহ" required />
-  <input type="number" id="payAmount" placeholder="পরিশোধ টাকা" required />
-  <button type="submit">কিস্তি যোগ করুন</button>
-</form>
+      <label>সাপ্তাহিক কিস্তির সংখ্যা (১-৪০)</label>
+      <input type="number" id="weeklyInstallments" min="1" max="40" required>
 
-<!-- Toast Message -->
-<div id="toast"></div>
+      <button type="submit">মেম্বার সংরক্ষণ করুন</button>
+    </form>
 
-  </div>  <script>
+    <div id="membersList"></div>
+
+    <div id="memberDetailsSection">
+      <h3>মেম্বার ডিটেইলস</h3>
+      <div id="memberDetails"></div>
+    </div>
+
+    <form id="installmentForm">
+      <h2>নতুন কিস্তি যোগ করুন</h2>
+      <label>মেম্বার ID</label>
+      <input type="number" id="memberId" required>
+
+      <label>সপ্তাহ নম্বর</label>
+      <input type="number" id="weekNo" required min="1" max="40">
+
+      <label>পরিশোধের পরিমাণ</label>
+      <input type="number" id="payAmount" required>
+
+      <button type="submit">কিস্তি যোগ করুন</button>
+    </form>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
     const baseURL = "";
 
-    function showToast(message, isSuccess = true) {
+    function showToast(msg, success = true) {
       const toast = document.getElementById("toast");
-      toast.innerText = message;
-      toast.className = isSuccess ? "show" : "show error";
+      toast.textContent = msg;
+      toast.className = "show";
+      if (!success) toast.classList.add("error");
       setTimeout(() => {
-        toast.className = "";
-        toast.innerText = "";
-      }, 3000);
-    }
-
-    async function getAllMembers() {
-      const res = await fetch(`${baseURL}/all-members`);
-      const members = await res.json();
-      const container = document.getElementById("membersList");
-      container.innerHTML = "";
-      members.forEach((m) => {
-        const card = document.createElement("div");
-        card.className = "member-card";
-        card.innerHTML = `
-          <b>${m.name}</b><br/>
-          ID: ${m.id}<br/>
-          ফোন: ${m.phone}<br/>
-          NID: ${m.nid}
-        `;
-        card.onclick = () => showMemberDetails(m.id);
-        container.appendChild(card);
-      });
-    }
-
-    async function showMemberDetails(id) {
-      const res = await fetch(`${baseURL}/status/${id}`);
-      const data = await res.json();
-      const container = document.getElementById("memberDetails");
-      container.innerHTML = `
-        <h3>${data.name} (ID: ${id})</h3>
-        <p><b>ফোন:</b> ${data.phone}</p>
-        <p><b>NID:</b> ${data.nid}</p>
-        <p><b>ঋণের পরিমাণ:</b> ${data.loan.amount}</p>
-        <p><b>মোট ফেরত:</b> ${data.loan.totalPayable}</p>
-        <p><b>সাপ্তাহিক কিস্তি:</b> ${data.loan.weeklyInstallment}</p>
-        <p><b>পরিশোধ:</b> ${data.totalPaid}</p>
-        <p><b>বাকি:</b> ${data.remaining}</p>
-        <div id="installmentsBox">
-          ${
-            data.installments.length === 0
-              ? "<p>কোন কিস্তি পরিশোধ করা হয় নি।</p>"
-              : data.installments.map(i => `
-                  <div class="installment">
-                    সপ্তাহ ${i.weekNo}<br>
-                    ৳${i.amount}<br>
-                    <small>${new Date(i.date).toLocaleDateString("bn-BD")}</small>
-                  </div>
-                `).join("")
-          }
-        </div>
-      `;
-      document.getElementById("memberDetailsSection").style.display = "block";
-    }
-
-    function closeDetails() {
-      document.getElementById("memberDetailsSection").style.display = "none";
+        toast.className = toast.className.replace("show", "").trim();
+      }, 3500);
     }
 
     document.getElementById("addMemberForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const name = document.getElementById("name").value;
-      const phone = document.getElementById("phone").value;
-      const nid = document.getElementById("nid").value;
-      const loanAmount = document.getElementById("loanAmount").value;
-      const weeklyInstallments = document.getElementById("weeklyInstallments").value;
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+      const nid = nidInput.value.trim();
+      const loanAmount = loanAmountInput.value.trim();
+      const weeklyInstallments = weeklyInstallmentsInput.value.trim();
 
-      const res = await fetch(`${baseURL}/add-member`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, nid, loanAmount, weeklyInstallments })
-      });
-      const data = await res.json();
-      if (data.error) showToast(data.error, false);
-      else {
-        showToast(data.message);
-        e.target.reset();
-        getAllMembers();
+      try {
+        const res = await fetch(`${baseURL}/add-member`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, phone, nid, loanAmount, weeklyInstallments })
+        });
+        const data = await res.json();
+        if (data.error) showToast(data.error, false);
+        else {
+          showToast(data.message);
+          e.target.reset();
+          loadMembers();
+        }
+      } catch {
+        showToast("সার্ভারে সমস্যা হয়েছে!", false);
       }
     });
+
+    async function loadMembers() {
+      try {
+        const res = await fetch(`${baseURL}/all-members`);
+        const members = await res.json();
+        const container = document.getElementById("membersList");
+        container.innerHTML = "";
+        members.forEach(member => {
+          const card = document.createElement("div");
+          card.className = "member-card";
+          card.innerHTML = `<b>${member.name}</b><br>ID: ${member.id}<br>ফোন: ${member.phone}`;
+          card.onclick = () => showDetails(member.id);
+          container.appendChild(card);
+        });
+      } catch {
+        showToast("ডাটা লোড করতে সমস্যা!", false);
+      }
+    }
+
+    async function showDetails(id) {
+      try {
+        const res = await fetch(`${baseURL}/status/${id}`);
+        const m = await res.json();
+        const box = document.getElementById("memberDetails");
+        box.innerHTML = `
+          <p><b>নাম:</b> ${m.name}</p>
+          <p><b>ফোন:</b> ${m.phone}</p>
+          <p><b>NID:</b> ${m.nid}</p>
+          <p><b>ঋণ:</b> ${m.loan.amount}</p>
+          <p><b>সাপ্তাহিক কিস্তি:</b> ${m.loan.weeklyInstallment}</p>
+          <p><b>মোট ফেরত:</b> ${m.loan.totalPayable}</p>
+          <p><b>পরিশোধ:</b> ${m.totalPaid}</p>
+          <p><b>বাকি:</b> ${m.remaining}</p>
+          <div class="installments">
+            ${m.installments.length === 0 ? 'কোন কিস্তি দেওয়া হয়নি' :
+              m.installments.map(i => `<div class="installment">সপ্তাহ ${i.weekNo}<br>৳${i.amount}</div>`).join("")
+            }
+          </div>
+        `;
+        document.getElementById("memberDetailsSection").style.display = "block";
+      } catch {
+        showToast("ডিটেইলস লোড করতে সমস্যা হয়েছে", false);
+      }
+    }
 
     document.getElementById("installmentForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const memberId = document.getElementById("memberId").value;
-      const weekNo = document.getElementById("weekNo").value;
-      const payAmount = document.getElementById("payAmount").value;
+      const memberId = document.getElementById("memberId").value.trim();
+      const weekNo = document.getElementById("weekNo").value.trim();
+      const payAmount = document.getElementById("payAmount").value.trim();
 
-      const res = await fetch(`${baseURL}/add-installment?memberId=${memberId}&weekNo=${weekNo}&amount=${payAmount}`);
-      const data = await res.json();
-      if (data.error) showToast(data.error, false);
-      else {
-        showToast(data.message);
-        e.target.reset();
-        getAllMembers();
-        const detailsVisible = document.getElementById("memberDetailsSection").style.display === "block";
-        if (detailsVisible) showMemberDetails(Number(memberId));
+      try {
+        const res = await fetch(`${baseURL}/add-installment?memberId=${memberId}&weekNo=${weekNo}&amount=${payAmount}`);
+        const data = await res.json();
+        if (data.error) showToast(data.error, false);
+        else {
+          showToast(data.message);
+          e.target.reset();
+          loadMembers();
+          showDetails(memberId);
+        }
+      } catch {
+        showToast("সার্ভারে সমস্যা হয়েছে!", false);
       }
     });
 
-    window.onload = getAllMembers;
-  </script></body>
+    window.onload = loadMembers;
+
+    // Easy DOM shortcut
+    const nameInput = document.getElementById("name");
+    const phoneInput = document.getElementById("phone");
+    const nidInput = document.getElementById("nid");
+    const loanAmountInput = document.getElementById("loanAmount");
+    const weeklyInstallmentsInput = document.getElementById("weeklyInstallments");
+  </script>
+</body>
 </html>
