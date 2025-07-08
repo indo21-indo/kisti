@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Loan কিস্তি SPA</title>
+  <title>Loan/কিস্তি</title>
   <style>
     * {
       box-sizing: border-box;
@@ -54,7 +54,7 @@
     section {
       display: none;
     }
-    section.active {
+    section.active, section[style*="display: block"] {
       display: block;
     }
 
@@ -107,6 +107,7 @@
       transform: translateY(-3px);
     }
 
+    /* Toast */
     #toast {
       display: none;
       position: fixed;
@@ -174,6 +175,43 @@
       margin-bottom: 10px;
     }
 
+    /* Compact Member List */
+    #memberListCompact {
+      padding: 20px 0;
+    }
+    #compactMembersGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+    .member-box {
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      user-select: none;
+      transition: 0.3s;
+      text-align: center;
+      font-weight: 600;
+    }
+    .member-box:hover {
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+      transform: translateY(-3px);
+    }
+
+    /* Member Profile */
+    #memberProfile button.close-btn {
+      background: #ef4444;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
     @media (max-width: 700px) {
       body {
         flex-direction: column;
@@ -196,6 +234,9 @@
       #weekDropdown {
         width: 100px;
       }
+      #compactMembersGrid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      }
     }
   </style>
 </head>
@@ -205,9 +246,11 @@
     <button id="nav-add-installment">💸 কিস্তি দিন</button>
     <button id="nav-status">📊 রিপোর্ট</button>
     <button id="nav-all-members">👥 সব মেম্বার</button>
+    <button id="nav-member-list-compact">📋 মেম্বার লিস্ট (কমপ্যাক্ট)</button>
   </nav>
 
   <main class="content">
+    <!-- Add Member -->
     <section id="add-member" class="active">
       <h2>মেম্বার যোগ করুন</h2>
       <input id="name" type="text" placeholder="নাম" />
@@ -220,6 +263,7 @@
       <button onclick="addMember()">✅ মেম্বার যোগ করুন</button>
     </section>
 
+    <!-- Add Installment -->
     <section id="add-installment">
       <h2>কিস্তি জমা দিন</h2>
       <div style="position:relative; width:150px;">
@@ -233,6 +277,7 @@
       <button onclick="addInstallment()">💸 কিস্তি দিন</button>
     </section>
 
+    <!-- Status -->
     <section id="status">
       <h2>মেম্বার রিপোর্ট</h2>
       <input id="statusId" placeholder="Member ID" />
@@ -240,37 +285,62 @@
       <div id="output" style="white-space:pre-line; background:#e0f2fe; padding:10px; border-radius:10px; margin-top:10px;"></div>
     </section>
 
+    <!-- All Members (Big Cards) -->
     <section id="all-members">
       <h2>সব মেম্বার</h2>
       <button onclick="getAllMembers()">👥 মেম্বার লিস্ট দেখুন</button>
       <div id="membersList"></div>
     </section>
+
+    <!-- Compact Member List -->
+    <section id="memberListCompact" style="display:none; padding: 20px 0;">
+      <h2>মেম্বার লিস্ট (কমপ্যাক্ট ভিউ)</h2>
+      <div id="compactMembersGrid"></div>
+    </section>
+
+    <!-- Member Profile -->
+    <section id="memberProfile" style="display:none; padding: 20px;">
+      <button class="close-btn" onclick="closeMemberProfile()">❌ বন্ধ করুন</button>
+      <div id="profileDetails"></div>
+    </section>
   </main>
 
-  <section id="memberDetailsSection">
-    <button class="close-btn" onclick="closeDetails()">Close ✖</button>
-    <div id="memberDetails"></div>
-  </section>
-
+  <!-- Toast -->
   <div id="toast"></div>
 
   <script>
-    const baseURL = ""; // আপনার সার্ভারের URL দিন
+    const baseURL = ""; // এখানে তোমার সার্ভারের URL বসাও
 
-    // Navigation
+    // Navigation buttons and sections
     const navButtons = document.querySelectorAll("nav.sidebar button");
     const sections = document.querySelectorAll("main.content section");
     navButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         navButtons.forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
-        sections.forEach((s) => s.classList.remove("active"));
-        const id = btn.id.replace("nav-", "");
-        document.getElementById(id).classList.add("active");
+        hideAllSections();
+        // id গুলো nav- এর পরে section এর id এর সাথে মিলবে
+        let id = btn.id.replace("nav-", "");
+        // Compact list and member profile handled separately
+        if (id === "member-list-compact") {
+          showCompactMembers();
+        } else if (id === "memberProfile") {
+          // profile manually shown, do nothing here
+        } else {
+          const section = document.getElementById(id);
+          if (section) section.style.display = "block";
+        }
       });
     });
 
-    // Update installment preview on add member form
+    function hideAllSections() {
+      sections.forEach((sec) => (sec.style.display = "none"));
+      // Also hide compact and profile if shown outside sections
+      document.getElementById('memberListCompact').style.display = 'none';
+      document.getElementById('memberProfile').style.display = 'none';
+    }
+
+    // Update installment preview
     function updateInstallment() {
       const amount = Number(document.getElementById("amount").value);
       const weeks = Number(document.getElementById("weeks").value);
@@ -332,7 +402,7 @@
       document.getElementById("installmentPreview").innerText = "";
     }
 
-    // Check installment
+    // Check installment on add installment page
     async function checkInstallment() {
       const id = document.getElementById("memberId").value.trim();
       const week = Number(document.getElementById("weekNo").value.trim());
@@ -343,18 +413,6 @@
 
       if (data.error) {
         showToast(data.error, false);
-        return;
-      }
-
-      // Check if previous weeks are paid
-      const unpaidWeeks = [];
-      for(let w=1; w<week; w++){
-        const paid = data.installments.find(i => i.weekNo === w);
-        if(!paid) unpaidWeeks.push(w);
-      }
-      if(unpaidWeeks.length > 0){
-        showToast("আগের কিস্তি পরিশোধ না করার কারণে এই সপ্তাহের কিস্তি জমা দেওয়া সম্ভব নয়।", false);
-        document.getElementById("payAmount").value = "";
         return;
       }
 
@@ -412,7 +470,7 @@ ${data.installments.length === 0 ? "কোন কিস্তি পরিশো
       `;
     }
 
-    // Get all members & show cards
+    // All members big cards list
     async function getAllMembers() {
       const res = await fetch(`${baseURL}/all-members`);
       const members = await res.json();
@@ -441,7 +499,7 @@ ${data.installments.length === 0 ? "কোন কিস্তি পরিশো
       });
     }
 
-    // Show member full details popup
+    // Show member details popup (existing big card view)
     async function showMemberDetails(id) {
       const res = await fetch(`${baseURL}/status/${id}`);
       const data = await res.json();
@@ -452,73 +510,83 @@ ${data.installments.length === 0 ? "কোন কিস্তি পরিশো
       const container = document.getElementById("memberDetails");
       container.innerHTML = `
         <h3>${data.name} (ID: ${id})</h3>
-        <p><b>ঋণের পরিমাণ:</b> ${data.loan.amount}</p>
-        <p><b>মোট ফেরত:</b> ${data.loan.totalPayable}</p>
-        <p><b>সাপ্তাহিক কিস্তি:</b> ${data.loan.weeklyInstallment}</p>
-        <p><b>পরিশোধিত:</b> ${data.totalPaid}</p>
-        <p><b>বাকি:</b> ${data.remaining}</p>
-        <hr/>
+        <!-- Continued from previous index.html -->
+        <p><b>ঋণের পরিমাণ:</b> ${data.loan.amount} টাকা</p>
+        <p><b>মোট ফেরত:</b> ${data.loan.totalPayable} টাকা</p>
+        <p><b>সাপ্তাহিক কিস্তি:</b> ${data.loan.weeklyInstallment} টাকা</p>
+        <p><b>পরিশোধিত:</b> ${data.totalPaid} টাকা</p>
+        <p><b>বাকি:</b> ${data.remaining} টাকা</p>
         <h4>কিস্তি বিস্তারিত:</h4>
-        ${data.installments.length === 0 ? "<p>কোন কিস্তি পরিশোধ হয়নি।</p>" :
-          `<ul>${data.installments.map(i => `<li>সপ্তাহ ${i.weekNo}: ${i.amount} টাকা (তারিখ: ${new Date(i.date).toLocaleDateString()})</li>`).join('')}</ul>`}
+        <ul>
+          ${data.installments.map(i => `<li>সপ্তাহ ${i.weekNo}: ${i.amount} টাকা (তারিখ: ${new Date(i.date).toLocaleDateString()})</li>`).join('')}
+        </ul>
+        <button onclick="fillInstallmentForm(${id}, ${data.loan.weeklyInstallment})">এই মেম্বারের কিস্তি দিন</button>
       `;
       document.getElementById("memberDetailsSection").style.display = "block";
     }
 
-    function closeDetails() {
+    function closeMemberDetails() {
       document.getElementById("memberDetailsSection").style.display = "none";
     }
 
-    // Week number dropdown with filter & autocomplete
-    const weekInput = document.getElementById("weekNo");
-    const weekDropdown = document.getElementById("weekDropdown");
-
-    function generateWeekList() {
-      let weeks = [];
-      for (let i = 1; i <= 40; i++) weeks.push(i);
-      return weeks;
+    // Compact list page
+    async function showCompactMembers() {
+      hideAllSections();
+      const grid = document.getElementById("compactMembersGrid");
+      document.getElementById("memberListCompact").style.display = "block";
+      const res = await fetch(`${baseURL}/all-members`);
+      const members = await res.json();
+      if (members.error) {
+        showToast(members.error, false);
+        return;
+      }
+      grid.innerHTML = "";
+      members.forEach(m => {
+        const box = document.createElement("div");
+        box.className = "member-box";
+        box.innerHTML = `${m.name}<br>ID: ${m.id}`;
+        box.onclick = () => showProfile(m.id);
+        grid.appendChild(box);
+      });
     }
 
-    weekInput.addEventListener("input", () => {
-      const val = weekInput.value.trim();
-      if (!val) {
-        weekDropdown.style.display = "none";
+    async function showProfile(id) {
+      hideAllSections();
+      const profile = document.getElementById("profileDetails");
+      document.getElementById("memberProfile").style.display = "block";
+      const res = await fetch(`${baseURL}/status/${id}`);
+      const data = await res.json();
+      if (data.error) {
+        showToast(data.error, false);
         return;
       }
-      const weeks = generateWeekList().filter((w) => w.toString().startsWith(val));
-      if (weeks.length === 0) {
-        weekDropdown.style.display = "none";
-        return;
-      }
-      weekDropdown.innerHTML = weeks
-        .map((w) => `<li>${w}</li>`)
-        .join("");
-      weekDropdown.style.display = "block";
-    });
+      profile.innerHTML = `
+        <h3>${data.name} (ID: ${id})</h3>
+        <p><b>ঋণের পরিমাণ:</b> ${data.loan.amount} টাকা</p>
+        <p><b>মোট ফেরত:</b> ${data.loan.totalPayable} টাকা</p>
+        <p><b>সাপ্তাহিক কিস্তি:</b> ${data.loan.weeklyInstallment} টাকা</p>
+        <p><b>পরিশোধিত:</b> ${data.totalPaid} টাকা</p>
+        <p><b>বাকি:</b> ${data.remaining} টাকা</p>
+        <h4>কিস্তি বিস্তারিত:</h4>
+        <ul>
+          ${data.installments.map(i => `<li>সপ্তাহ ${i.weekNo}: ${i.amount} টাকা (তারিখ: ${new Date(i.date).toLocaleDateString()})</li>`).join('')}
+        </ul>
+        <button onclick="fillInstallmentForm(${id}, ${data.loan.weeklyInstallment})">এই মেম্বারের কিস্তি দিন</button>
+      `;
+    }
 
-    weekDropdown.addEventListener("click", (e) => {
-      if (e.target.tagName === "LI") {
-        weekInput.value = e.target.innerText;
-        weekDropdown.style.display = "none";
-        checkInstallment(); // Auto check installment when select from dropdown
-      }
-    });
+    function closeMemberProfile() {
+      document.getElementById("memberProfile").style.display = "none";
+    }
 
-    document.addEventListener("click", (e) => {
-      if (!weekDropdown.contains(e.target) && e.target !== weekInput) {
-        weekDropdown.style.display = "none";
-      }
-    });
-
-    // Auto check installment amount when user inputs week number manually
-    weekInput.addEventListener("change", () => {
-      checkInstallment();
-    });
-    weekInput.addEventListener("blur", () => {
-      setTimeout(() => { // Delay so dropdown click works
-        weekDropdown.style.display = "none";
-      }, 200);
-    });
+    function fillInstallmentForm(id, amount) {
+      document.getElementById("memberId").value = id;
+      document.getElementById("payAmount").value = amount;
+      navButtons.forEach((b) => b.classList.remove("active"));
+      document.getElementById("nav-add-installment").classList.add("active");
+      hideAllSections();
+      document.getElementById("add-installment").style.display = "block";
+    }
   </script>
 </body>
 </html>
